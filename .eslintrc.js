@@ -24,5 +24,10 @@ module.exports = {
 	parserOptions: {
 		ecmaVersion: 'latest',
 	},
-	rules: {},
+	rules: {
+		'@typescript-eslint/no-var-requires': 'off',
+	},
+	globals: {
+		process: true,
+	},
 };
