@@ -6,18 +6,21 @@
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"prepare": "husky install",
-		"start": "node src/index.js",
-		"build": "tsc"
+		"start": "node dist/index.js",
+		"build": "tsc",
+		"start:server": "npx nodemon src/index.ts"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"bcrypt": "^5.1.0",
 		"dotenv": "^16.3.1",
 		"email-validator": "^2.0.4",
 		"express": "^4.18.2",
 		"husky": ">=6",
 		"mongoose": "^7.3.2",
+		"passport": "^0.6.0",
 		"validator": "^13.9.0"
 	},
 	"devDependencies": {
