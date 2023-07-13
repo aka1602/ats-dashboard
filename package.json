@@ -14,13 +14,18 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
+		"bcrypt": "^5.1.0",
 		"dotenv": "^16.3.1",
 		"email-validator": "^2.0.4",
 		"express": "^4.18.2",
 		"husky": ">=6",
 		"mongoose": "^7.3.2",
+<<<<<<< HEAD
 		"swagger-jsdoc": "^6.2.8",
 		"swagger-ui-express": "^5.0.0",
+=======
+		"passport": "^0.6.0",
+>>>>>>> aa2e957c60dceb15172d66f7b91d69148f4a58f7
 		"validator": "^13.9.0"
 	},
 	"devDependencies": {
