@@ -21,19 +21,14 @@ const employerSchema = new mongoose.Schema({
 		required: [true, 'Role should be mentioned'],
 		enum: ['Company', 'Individual'],
 	},
-	password: {
-		type: String,
-		// required: [true, "Password should be present"],
-		minLength: 8,
-	},
-	confirmPassword: {
-		type: String,
-		// required: [true, "confirm the password"],
-		minLength: 8,
-	},
 	phone: {
 		type: String,
 		required: [true, 'Contact Number should be mentioned'],
+	},
+	authentication: {
+		password: { type: String, required: true, select: false },
+		salt: { type: String, select: false },
+		sessionToken: { type: String, select: false },
 	},
 	companyName: {
 		type: String,

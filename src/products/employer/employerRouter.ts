@@ -1,5 +1,5 @@
 import {
-	createEmployer,
+	register,
 	getAllEmployers,
 	getEmployerById,
 	updateEmployerById,
@@ -8,7 +8,7 @@ import express from 'express';
 
 export default (router: express.Router) => {
 	router.get('/employer', getAllEmployers);
-	router.post('/employer', createEmployer);
+	router.post('/employer', register);
 	router.get('/employer/:id', getEmployerById);
 	router.patch('/employer/:id', updateEmployerById);
 	//   router.delete("/:id", delel);
