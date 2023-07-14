@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import router from './router';
+import swaggerUI from 'swagger-ui-express';
+import swaggerJsDoc, { Options } from 'swagger-jsdoc';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -38,3 +40,24 @@ app.listen(3000, () => {
 
 // Use the router for API routes
 app.use('/api/v1/', router());
+
+// swagger docs setup
+const options: Options = {
+	definition: {
+		openapi: '3.0.1',
+		info: {
+			title: 'ATS-Track',
+			version: '1.0.0',
+			description: 'Applicant Tracking System',
+		},
+		servers: [
+			{
+				url: 'http://localhost:8000',
+			},
+		],
+	},
+	apis: ['./**/*.ts'],
+};
+// /api-docs for the api docs
+const specs = swaggerJsDoc(options);
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs));
