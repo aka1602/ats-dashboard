@@ -162,7 +162,12 @@ export const login = async (req: express.Request, res: express.Response) => {
 			path: '/',
 		});
 
-		return res.status(200).json(user).end();
+		return res
+			.status(200)
+			.json({
+				message: 'logged in',
+			})
+			.end();
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(400);

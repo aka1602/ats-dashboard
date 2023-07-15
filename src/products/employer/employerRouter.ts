@@ -3,6 +3,7 @@ import {
 	getAllEmployers,
 	getEmployerById,
 	updateEmployerById,
+	login,
 } from './employerController';
 import express from 'express';
 
@@ -11,5 +12,6 @@ export default (router: express.Router) => {
 	router.post('/employer', register);
 	router.get('/employer/:id', getEmployerById);
 	router.patch('/employer/:id', updateEmployerById);
+	router.post('/employer/login', login);
 	//   router.delete("/:id", delel);
 };
