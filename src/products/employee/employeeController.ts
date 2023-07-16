@@ -70,7 +70,7 @@ export const deleteEmployee = async (
 	res: express.Response
 ) => {
 	try {
-		const { email, values } = req.body;
+		const { email } = req.body;
 		const deletedEmployee = await deleteEmployeeById(email);
 		return res
 			.status(200)
