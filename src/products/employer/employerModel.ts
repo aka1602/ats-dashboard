@@ -57,3 +57,5 @@ const employerSchema = new mongoose.Schema({
 });
 
 export const EmployerModel = mongoose.model('Employer', employerSchema);
+export const getEmployerBySessionToken = async (sessionToken: string) =>
+	EmployerModel.find({ 'authentication.sessionToken': sessionToken });
