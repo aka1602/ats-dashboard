@@ -1,9 +1,9 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import router from './router';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJsDoc, { Options } from 'swagger-jsdoc';
+import cookieParser = require('cookie-parser');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -29,15 +29,17 @@ database.once('connected', () => {
 
 // Create Express app
 const app = express();
-
 // Parse JSON request bodies
 app.use(express.json());
+// use cookie-parserx
+app.use(cookieParser());
 
 // Start the server
 app.listen(3000, () => {
 	console.log('Server Started at http://localhost:3000');
 });
 
+import router from './router';
 // Use the router for API routes
 app.use('/api/v1/', router());
 
@@ -52,7 +54,7 @@ const options: Options = {
 		},
 		servers: [
 			{
-				url: 'http://localhost:8000',
+				url: 'http://localhost:3000',
 			},
 		],
 	},

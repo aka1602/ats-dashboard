@@ -50,9 +50,9 @@ const jobSchema = new mongoose.Schema({
 		type: String,
 	},
 	employerId: {
-		type: mongoose.Schema.ObjectId,
+		type: mongoose.Schema.Types.ObjectId,
 		required: [true, 'employer Id should be created'],
 	},
 });
 
-export const jobModel = new mongoose.Model('Job', jobSchema);
+export const jobModel = mongoose.model('job', jobSchema);
