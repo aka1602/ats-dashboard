@@ -31,7 +31,7 @@ database.once('connected', () => {
 const app = express();
 // Parse JSON request bodies
 app.use(express.json());
-// use cookie-parserx
+// use cookie-parser
 app.use(cookieParser());
 
 // Start the server

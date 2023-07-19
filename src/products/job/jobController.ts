@@ -1,13 +1,14 @@
 import express from 'express';
 import { jobModel } from './jobModel';
-import { get } from 'lodash';
 
 export const jobCreate = async (
 	req: express.Request,
 	res: express.Response
 ) => {
 	try {
-		let currentUserId: any = get(req, 'employer._id');
+		let currentUserId = req.params.id;
+		console.log(currentUserId);
+
 		if (!currentUserId) {
 			return res.sendStatus(403);
 		}
@@ -17,7 +18,7 @@ export const jobCreate = async (
 			employerId: currentUserId,
 		});
 
-		return res.sendStatus(201).json(job).end();
+		return res.json(job).end();
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(403);

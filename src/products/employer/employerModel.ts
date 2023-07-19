@@ -25,11 +25,7 @@ const employerSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Contact Number should be mentioned'],
 	},
-	authentication: {
-		password: { type: String, required: true, select: false },
-		salt: { type: String, select: false },
-		sessionToken: { type: String, select: false },
-	},
+	password: { type: String, required: true, select: false },
 	companyName: {
 		type: String,
 		required: [true, 'Company Name should be present'],
@@ -57,5 +53,3 @@ const employerSchema = new mongoose.Schema({
 });
 
 export const EmployerModel = mongoose.model('Employer', employerSchema);
-export const getEmployerBySessionToken = async (sessionToken: string) =>
-	EmployerModel.find({ 'authentication.sessionToken': sessionToken });

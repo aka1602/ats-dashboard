@@ -1,60 +1,53 @@
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import express from 'express';
-import crypto from 'crypto';
-import { get, merge } from 'lodash';
-import { getEmployerBySessionToken } from '../products/employer';
-export const random = () => crypto.randomBytes(120).toString('base64');
 
-const SECRET = `${process.env.SECRET_KEY}`;
-export const authentication = (salt: string, password: string) => {
-	return crypto
-		.createHmac('sha256', [salt, password].join('/'))
-		.update(SECRET)
-		.digest('hex');
+export const hashPassword = async (pasword: string): Promise<string> => {
+	pasword = await bcrypt.hash(pasword, 12);
+
+	return pasword;
 };
 
-export const isAuthenticated = async (
+export const comparePassword = async (
+	password: string,
+	hash: string
+): Promise<boolean> => await bcrypt.compare(password, hash);
+
+export const isLoggedIn = async (
 	req: express.Request,
 	res: express.Response,
 	next: express.NextFunction
 ) => {
 	try {
-		const sessionToken = req.cookies('AUTH-COOKIE');
+		const token = req.cookies.login;
+		if (!token) {
+			return res
+				.json({
+					message: 'Please logged in',
+				})
+				.end();
+		} else {
+			const payload = jwt.verify(token, 'Emdd');
 
-		if (!sessionToken) {
-			return res.sendStatus(403);
+			if (typeof payload === 'object') {
+				const id = payload.payload;
+				// const employer = await EmployeeModel.findById(id);
+				req.params.id = id;
+				next();
+			} else {
+				return res
+					.json({
+						message: 'User not found',
+					})
+					.end();
+			}
 		}
-		const existingUser = await getEmployerBySessionToken(sessionToken);
-		if (!existingUser) {
-			return res.sendStatus(403);
-		}
-
-		merge(req, { employer: existingUser });
-		next();
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
-	}
-};
-
-export const isOwner = async (
-	req: express.Request,
-	res: express.Response,
-	next: express.NextFunction
-) => {
-	try {
-		const id = req.params.id;
-
-		let currentUserId: any = get(req, 'employer._id');
-		if (!currentUserId) {
-			return res.sendStatus(403);
-		}
-		currentUserId = String(currentUserId);
-		if (currentUserId !== id) {
-			return res.sendStatus(403);
-		}
-		next();
-	} catch (error) {
-		console.log(error);
-		return res.sendStatus(403);
+		return res
+			.json({
+				message: 'ERROR',
+			})
+			.end();
 	}
 };

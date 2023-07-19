@@ -1,6 +1,7 @@
 import { EmployerModel } from './employerModel';
 import express from 'express';
-import { authentication, random } from '../../utils/common';
+import { comparePassword, hashPassword } from '../../utils/common';
+import jwt from 'jsonwebtoken';
 
 export const getAllEmployers = async (
 	req: express.Request,
@@ -80,47 +81,15 @@ export const updateEmployerById = async (
 	}
 };
 
-export const register = async (req: express.Request, res: express.Response) => {
+export const signup = async (req: express.Request, res: express.Response) => {
 	try {
-		const { email, password, name } = req.body;
+		req.body.password = await hashPassword(req.body.password);
+		const employer = await EmployerModel.create(req.body);
 
-		if (!password || !email) {
-			return res.sendStatus(403);
-		}
-
-		const existingUser = await EmployerModel.findOne({ email });
-		if (existingUser) {
-			return res.sendStatus(400);
-		}
-
-		const salt: string = random();
-		const {
-			role,
-			phone,
-			companyName,
-			industry,
-			designation,
-			pincode,
-			address,
-		} = req.body;
-
-		const employer = await EmployerModel.create({
-			name,
-			email,
-			authentication: {
-				password: authentication(salt, password),
-				salt,
-			},
-			role,
-			phone,
-			companyName,
-			industry,
-			designation,
-			pincode,
-			address,
+		res.json({
+			message: 'User signed up',
+			data: employer,
 		});
-
-		return res.sendStatus(200).json(employer).end();
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(403);
@@ -130,46 +99,42 @@ export const register = async (req: express.Request, res: express.Response) => {
 export const login = async (req: express.Request, res: express.Response) => {
 	try {
 		const { email, password } = req.body;
+		if (!email || !password) throw new Error('unsufficent data');
 
-		if (!email || !password) {
-			return res.sendStatus(400);
+		const employer = await EmployerModel.findOne({ email }).select('+password');
+		const hash = employer?.password;
+		console.log(hash);
+
+		if (!hash) {
+			return res.sendStatus(400).end();
+		} else {
+			const result = await comparePassword(password, hash);
+			if (!result) {
+				return res
+					.json({
+						message: 'Wrong Creditanls',
+					})
+					.end();
+			} else {
+				const uid = employer._id;
+				const token = await jwt.sign({ payload: uid }, 'Emdd', {
+					expiresIn: '10m',
+				});
+
+				res.cookie('login', token, { httpOnly: true });
+				return res.json({
+					message: 'User logged in',
+				});
+			}
 		}
-
-		const user = await EmployerModel.findOne({ email }).select(
-			'+authentication.salt +authentication.password'
-		);
-
-		if (!user || !user.authentication || !user.authentication.salt) {
-			return res.sendStatus(400);
-		}
-
-		const exprectedHash = authentication(user.authentication.salt, password);
-
-		if (user.authentication.password !== exprectedHash) {
-			return res.sendStatus(400);
-		}
-
-		const salt = random();
-		user.authentication.sessionToken = authentication(
-			salt,
-			user._id.toString()
-		);
-
-		await user.save();
-
-		res.cookie('AUTH-COOKIE', user.authentication.sessionToken, {
-			domain: 'localhost',
-			path: '/',
-		});
-
-		return res
-			.status(200)
-			.json({
-				message: 'logged in',
-			})
-			.end();
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(400);
+
+		res
+			.sendStatus(401)
+			.json({
+				message: 'ERROR',
+			})
+			.end();
 	}
 };

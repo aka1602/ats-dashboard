@@ -1,8 +1,8 @@
 import express from 'express';
-import { isAuthenticated } from '../../utils/common';
 import { jobCreate } from './jobController';
+import { isLoggedIn } from '../../utils/common';
 
 export default (router: express.Router) => {
-	router.post('/job', isAuthenticated, jobCreate);
+	router.post('/job', isLoggedIn, jobCreate);
 	return router;
 };
