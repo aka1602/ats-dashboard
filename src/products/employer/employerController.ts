@@ -117,9 +117,13 @@ export const login = async (req: express.Request, res: express.Response) => {
 					.end();
 			} else {
 				const uid = employer._id;
-				const token = await jwt.sign({ payload: uid }, 'Emdd', {
-					expiresIn: '10m',
-				});
+				const token = await jwt.sign(
+					{ payload: uid },
+					`${process.env.SECRET_KEY}`,
+					{
+						expiresIn: '10m',
+					}
+				);
 
 				res.cookie('login', token, { httpOnly: true });
 				return res.json({

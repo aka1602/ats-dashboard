@@ -27,7 +27,7 @@ export const isLoggedIn = async (
 				})
 				.end();
 		} else {
-			const payload = jwt.verify(token, 'Emdd');
+			const payload = jwt.verify(token, `${process.env.SECRET_KEY}`);
 
 			if (typeof payload === 'object') {
 				const id = payload.payload;
