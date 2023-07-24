@@ -30,7 +30,7 @@ database.once('connected', () => {
 // Create Express app
 const app = express();
 // Parse JSON request bodies
-app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 // use cookie-parser
 app.use(cookieParser());
 

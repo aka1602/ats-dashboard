@@ -5,12 +5,13 @@ import {
 	getEmployees,
 	updateEmployeeById,
 	deleteEmployeeById,
+	EmployeeModel,
 } from './employeeModal';
 
 // Create a new employee
 export const create = async (req: express.Request, res: express.Response) => {
 	try {
-		const newEmployee = await createEmployee(req.body);
+		const newEmployee = await createEmployee({ ...req.body });
 		return res.status(200).json({ data: newEmployee }).end();
 	} catch (error) {
 		console.error(error);
@@ -79,5 +80,22 @@ export const deleteEmployee = async (
 	} catch (error) {
 		console.error(error);
 		return res.status(400).json({ message: error }).end();
+	}
+};
+
+// add resume to upload
+export const addResume = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		// console.log(req.file?.filename);
+
+		await EmployeeModel.findByIdAndUpdate(id, { resume: req.file?.filename });
+		return res.sendStatus(200);
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(400);
 	}
 };
