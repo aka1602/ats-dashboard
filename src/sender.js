@@ -59,11 +59,7 @@ function main() {
                             to: "divya29prabhakar@gmail.com",
                             subject: "Hello from node",
                             text: "Hello world?",
-
-                           
-
                             html: { path: "D:/ATS_backend/ats-dashboard/src/Amp-index.html" },
-
                             //"<strong>Hello world?</strong>"
                         })];
                 case 1:

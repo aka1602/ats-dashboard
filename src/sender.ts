@@ -1,10 +1,6 @@
 import  * as  nodemailer from "nodemailer";
 
-
-import   * as  Mail from "nodemailer/lib/mailer";
-
-
-
+import    * as Mail from "nodemailer/lib/mailer";
 
 
 
@@ -27,11 +23,7 @@ async function main (){
     to: "divya29prabhakar@gmail.com",
     subject: "Hello from node",
     text: "Hello world?",
-
- 
-
     html: {path :"D:/ATS_backend/ats-dashboard/src/Amp-index.html"  },
-
   
       
     //"<strong>Hello world?</strong>"
