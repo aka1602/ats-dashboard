@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import swaggerUI from 'swagger-ui-express';
 import swaggerJsDoc, { Options } from 'swagger-jsdoc';
 import cookieParser = require('cookie-parser');
+import path = require('path');
 
 // Load environment variables from .env file
 dotenv.config();
@@ -34,6 +35,9 @@ app.use(express.urlencoded({ extended: true }));
 // use cookie-parser
 app.use(cookieParser());
 
+// use view engine
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 // Start the server
 app.listen(3000, () => {
 	console.log('Server Started at http://localhost:3000');
