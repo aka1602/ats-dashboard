@@ -5,6 +5,7 @@ import swaggerUI from 'swagger-ui-express';
 import swaggerJsDoc, { Options } from 'swagger-jsdoc';
 import cookieParser = require('cookie-parser');
 import path = require('path');
+import router from './router';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -44,7 +45,6 @@ app.listen(3000, () => {
 	console.log('Server Started at http://localhost:3000');
 });
 
-import router from './router';
 // Use the router for API routes
 app.use('/api/v1/', router());
 
