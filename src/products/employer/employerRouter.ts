@@ -1,5 +1,6 @@
+import { isLoggedIn } from '../../utils/common';
 import {
-	register,
+	signup,
 	getAllEmployers,
 	getEmployerById,
 	updateEmployerById,
@@ -9,8 +10,8 @@ import express from 'express';
 
 export default (router: express.Router) => {
 	router.get('/employer', getAllEmployers);
-	router.post('/employer', register);
-	router.get('/employer/:id', getEmployerById);
+	router.post('/employer', signup);
+	router.get('/employer/:id', isLoggedIn, getEmployerById);
 	router.patch('/employer/:id', updateEmployerById);
 	router.post('/employer/login', login);
 	//   router.delete("/:id", delel);
