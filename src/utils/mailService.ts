@@ -1,8 +1,8 @@
 import nodemailer from 'nodemailer';
 import pug from 'pug';
-import htmlToText from 'html-to-text';
+import { htmlToText } from 'html-to-text';
 
-module.exports = class Email {
+export class Email {
 	to: string;
 	firstName: string;
 	url: string;
@@ -17,7 +17,7 @@ module.exports = class Email {
 
 	newTransport() {
 		return nodemailer.createTransport({
-			host: 'smtp.gmai.com',
+			host: 'smtp.gmail.com',
 			port: 587,
 			auth: {
 				user: process.env.SMTP_USER,
@@ -41,7 +41,7 @@ module.exports = class Email {
 			to: this.to,
 			subject,
 			html,
-			text: htmlToText.convert(html, {
+			text: htmlToText(html, {
 				wordwrap: 130,
 			}),
 		};
@@ -60,4 +60,4 @@ module.exports = class Email {
 			'Your password reset token (valid for only 10 minutes)'
 		);
 	}
-};
+}
