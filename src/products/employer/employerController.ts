@@ -2,6 +2,7 @@ import { EmployerModel } from './employerModel';
 import express from 'express';
 import { comparePassword, hashPassword } from '../../utils/common';
 import jwt from 'jsonwebtoken';
+import { Email } from '../../utils/mailService';
 
 export const getAllEmployers = async (
 	req: express.Request,
@@ -86,7 +87,9 @@ export const signup = async (req: express.Request, res: express.Response) => {
 		req.body.password = await hashPassword(req.body.password);
 		const employer = await EmployerModel.create(req.body);
 
-		res.json({
+		const url = `${req.protocol}://${req.get('host')}/me`;
+		await new Email(employer, url).sendWelcome();
+		return res.json({
 			message: 'User signed up',
 			data: employer,
 		});
