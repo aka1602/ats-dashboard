@@ -13,7 +13,6 @@ export const createInterviewer = async (
 			{ _id: companyId },
 			{ $push: { interviewers: interviewer._id } }
 		);
-		await EmployerModel;
 		return res.status(200).json({
 			message: 'success',
 			data: {

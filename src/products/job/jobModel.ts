@@ -54,22 +54,40 @@ const jobSchema = new mongoose.Schema({
 		ref: 'Employer',
 		required: [true, 'employer Id should be created'],
 	},
-	candidates: [
+	Hired: [
 		{
 			type: mongoose.Schema.Types.ObjectId,
 			ref: 'Employees',
-			status: {
-				type: String,
-				enum: [
-					'Source',
-					'Applied',
-					'Contacted',
-					'Interview',
-					'Hired',
-					'Rejected',
-				],
-				default: 'Source',
-			},
+		},
+	],
+	Applied: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Rejected: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Source: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Interview: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Contacted: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
 		},
 	],
 });
