@@ -3,7 +3,6 @@ import express from 'express';
 import { comparePassword, hashPassword } from '../../utils/common';
 import jwt from 'jsonwebtoken';
 import { Email } from '../../utils/mailService';
-import { AsyncLocalStorage } from 'async_hooks';
 
 export const getAllEmployers = async (
 	req: express.Request,
