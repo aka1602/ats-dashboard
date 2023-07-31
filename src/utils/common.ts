@@ -20,6 +20,7 @@ export const isLoggedIn = async (
 ) => {
 	try {
 		const token = req.cookies.login;
+		console.log(token);
 		if (!token) {
 			return res
 				.json({

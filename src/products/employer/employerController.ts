@@ -3,6 +3,7 @@ import express from 'express';
 import { comparePassword, hashPassword } from '../../utils/common';
 import jwt from 'jsonwebtoken';
 import { Email } from '../../utils/mailService';
+import { AsyncLocalStorage } from 'async_hooks';
 
 export const getAllEmployers = async (
 	req: express.Request,
@@ -106,7 +107,6 @@ export const login = async (req: express.Request, res: express.Response) => {
 
 		const employer = await EmployerModel.findOne({ email }).select('+password');
 		const hash = employer?.password;
-		console.log(hash);
 
 		if (!hash) {
 			return res.sendStatus(400).end();
@@ -143,5 +143,43 @@ export const login = async (req: express.Request, res: express.Response) => {
 				message: 'ERROR',
 			})
 			.end();
+	}
+};
+
+export const createUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const employerId = req.params.id;
+		console.log(employerId);
+
+		// creating the user
+		const password = await hashPassword(req.body.password);
+		const { email, name, phone, role } = req.body;
+
+		await EmployerModel.findOneAndUpdate(
+			{ _id: employerId },
+			{
+				$push: {
+					users: {
+						email,
+						phone,
+						password,
+						role,
+						name,
+					},
+				},
+			}
+		);
+
+		return res
+			.json({
+				message: 'User created.',
+			})
+			.end();
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(400);
 	}
 };
