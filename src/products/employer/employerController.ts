@@ -113,6 +113,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 			const result = await comparePassword(password, hash);
 			if (!result) {
 				return res
+					.status(400)
 					.json({
 						message: 'Wrong Creditanls',
 					})
@@ -154,8 +155,10 @@ export const createUser = async (
 		console.log(employerId);
 
 		// creating the user
-		const password = await hashPassword(req.body.password);
 		const { email, name, phone, role } = req.body;
+
+		const password = await hashPassword(req.body.password);
+		console.log(password);
 
 		await EmployerModel.findOneAndUpdate(
 			{ _id: employerId },
@@ -177,6 +180,87 @@ export const createUser = async (
 				message: 'User created.',
 			})
 			.end();
+	} catch (error) {
+		console.log(error);
+		return res.sendStatus(400);
+	}
+};
+
+export const loginUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		console.log('Sl');
+
+		const { email, password, companyEmail } = req.body;
+		if (!email || !password || !companyEmail)
+			throw new Error('unsufficent data');
+
+		const employer = await EmployerModel.findOne(
+			{
+				email: companyEmail,
+			},
+			'users'
+		);
+		// Finding employer
+		if (!employer) {
+			return res.sendStatus(400);
+		}
+		// Finding employee
+		const arr = employer.users;
+		let user;
+
+		for (let i = 0; i < arr.length; i++) {
+			const element = arr[i];
+
+			if (element.email === email) {
+				user = element;
+				break;
+			}
+		}
+
+		if (!user) {
+			return res.sendStatus(400);
+		}
+		// comparing password
+		const result = await comparePassword(password, user.password);
+		// console.log(result);
+
+		if (!result) {
+			return res
+				.status(400)
+				.json({
+					message: 'Wrong Creditanls',
+				})
+				.end();
+		}
+		/*
+			const uid = employer._id;
+			const token = await jwt.sign(
+				{ payload: uid },
+				`${process.env.SECRET_KEY}`,
+				{
+					expiresIn: '10m',
+				}
+			);
+
+			res.cookie('login', token, { httpOnly: true });
+			return res.json({
+				message: 'User logged in',
+			});
+		*/
+		const token = await jwt.sign(
+			{ payload: user },
+			`${process.env.SECRET_KEY}`,
+			{
+				expiresIn: '1hr',
+			}
+		);
+		res.cookie('login', token, { httpOnly: true });
+		return res.json({
+			message: 'User logged in',
+		});
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(400);
