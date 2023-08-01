@@ -34,10 +34,7 @@ export const getEmployerById = async (
 ) => {
 	try {
 		const id = req.params.id;
-		const employer = await EmployerModel.findById(id).populate('interviewers', [
-			'name',
-			'email',
-		]);
+		const employer = await EmployerModel.findById(id);
 
 		return res.status(200).json({
 			message: 'success',
@@ -191,8 +188,6 @@ export const loginUser = async (
 	res: express.Response
 ) => {
 	try {
-		console.log('Sl');
-
 		const { email, password, companyEmail } = req.body;
 		if (!email || !password || !companyEmail)
 			throw new Error('unsufficent data');
@@ -204,6 +199,7 @@ export const loginUser = async (
 			'users'
 		);
 		// Finding employer
+		console.log('Sl');
 		if (!employer) {
 			return res.sendStatus(400);
 		}
@@ -226,7 +222,6 @@ export const loginUser = async (
 		// comparing password
 		const result = await comparePassword(password, user.password);
 		// console.log(result);
-
 		if (!result) {
 			return res
 				.status(400)
