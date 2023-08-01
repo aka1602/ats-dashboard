@@ -171,6 +171,8 @@ export const createUser = async (
 				},
 			}
 		);
+		const url = `${req.protocol}://${req.get('host')}/me`;
+		await new Email({ email, name }, url).sendWelcome();
 
 		return res
 			.json({
