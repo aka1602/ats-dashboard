@@ -18,13 +18,9 @@ export const getAllEmployers = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -43,13 +39,9 @@ export const getEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -69,13 +61,9 @@ export const updateEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -91,8 +79,9 @@ export const signup = async (req: express.Request, res: express.Response) => {
 			data: employer,
 		});
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(403);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -132,14 +121,9 @@ export const login = async (req: express.Request, res: express.Response) => {
 			}
 		}
 	} catch (error) {
-		console.log(error);
-
-		res
-			.sendStatus(401)
-			.json({
-				message: 'ERROR',
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -180,8 +164,9 @@ export const createUser = async (
 			})
 			.end();
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(400);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -203,7 +188,9 @@ export const loginUser = async (
 		// Finding employer
 		console.log('Sl');
 		if (!employer) {
-			return res.sendStatus(400);
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
 		}
 		// Finding employee
 		const arr = employer.users;
@@ -219,11 +206,13 @@ export const loginUser = async (
 		}
 
 		if (!user) {
-			return res.sendStatus(400);
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
 		}
 		// comparing password
 		const result = await comparePassword(password, user.password);
-		// console.log(result);
+
 		if (!result) {
 			return res
 				.status(400)
@@ -232,21 +221,7 @@ export const loginUser = async (
 				})
 				.end();
 		}
-		/*
-			const uid = employer._id;
-			const token = await jwt.sign(
-				{ payload: uid },
-				`${process.env.SECRET_KEY}`,
-				{
-					expiresIn: '10m',
-				}
-			);
 
-			res.cookie('login', token, { httpOnly: true });
-			return res.json({
-				message: 'User logged in',
-			});
-		*/
 		const token = await jwt.sign(
 			{ payload: user },
 			`${process.env.SECRET_KEY}`,
@@ -259,7 +234,8 @@ export const loginUser = async (
 			message: 'User logged in',
 		});
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(400);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };

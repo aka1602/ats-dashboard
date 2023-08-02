@@ -14,8 +14,9 @@ export const create = async (req: express.Request, res: express.Response) => {
 		const newEmployee = await createEmployee({ ...req.body });
 		return res.status(200).json({ data: newEmployee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -29,8 +30,9 @@ export const getEmployee = async (
 		const employee = await getEmployeeByEmail(email);
 		return res.status(200).json({ data: employee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -44,8 +46,9 @@ export const getAllEmployees = async (
 
 		return res.status(200).json({ data: employees }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -60,8 +63,9 @@ export const updateEmployee = async (
 		const updatedEmployee = await updateEmployeeById(id, values);
 		return res.status(200).json({ data: updatedEmployee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -78,8 +82,9 @@ export const deleteEmployee = async (
 			.json({ message: 'Employee is deleted', data: deletedEmployee })
 			.end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -95,7 +100,8 @@ export const addResume = async (
 		await EmployeeModel.findByIdAndUpdate(id, { resume: req.file?.filename });
 		return res.sendStatus(200);
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(400);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
