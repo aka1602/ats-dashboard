@@ -88,7 +88,7 @@ export const signup = async (req: express.Request, res: express.Response) => {
 export const login = async (req: express.Request, res: express.Response) => {
 	try {
 		const { email, password } = req.body;
-		if (!email || !password) throw new Error('unsufficent data');
+		if (!email || !password) throw new Error('Insufficent data');
 
 		const employer = await EmployerModel.findOne({ email }).select('+password');
 		const hash = employer?.password;
@@ -177,7 +177,7 @@ export const loginUser = async (
 	try {
 		const { email, password, companyEmail } = req.body;
 		if (!email || !password || !companyEmail)
-			throw new Error('unsufficent data');
+			throw new Error('Insufficent data');
 
 		const employer = await EmployerModel.findOne(
 			{
