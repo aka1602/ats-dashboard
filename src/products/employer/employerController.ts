@@ -18,13 +18,9 @@ export const getAllEmployers = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -34,10 +30,7 @@ export const getEmployerById = async (
 ) => {
 	try {
 		const id = req.params.id;
-		const employer = await EmployerModel.findById(id).populate('interviewers', [
-			'name',
-			'email',
-		]);
+		const employer = await EmployerModel.findById(id);
 
 		return res.status(200).json({
 			message: 'success',
@@ -46,13 +39,9 @@ export const getEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -72,13 +61,9 @@ export const updateEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -94,19 +79,19 @@ export const signup = async (req: express.Request, res: express.Response) => {
 			data: employer,
 		});
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(403);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
 export const login = async (req: express.Request, res: express.Response) => {
 	try {
 		const { email, password } = req.body;
-		if (!email || !password) throw new Error('unsufficent data');
+		if (!email || !password) throw new Error('Insufficent data');
 
 		const employer = await EmployerModel.findOne({ email }).select('+password');
 		const hash = employer?.password;
-		console.log(hash);
 
 		if (!hash) {
 			return res.sendStatus(400).end();
@@ -114,6 +99,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 			const result = await comparePassword(password, hash);
 			if (!result) {
 				return res
+					.status(400)
 					.json({
 						message: 'Wrong Creditanls',
 					})
@@ -135,13 +121,121 @@ export const login = async (req: express.Request, res: express.Response) => {
 			}
 		}
 	} catch (error) {
-		console.log(error);
+		return res.status(400).json({
+			message: error,
+		});
+	}
+};
 
-		res
-			.sendStatus(401)
+export const createUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const employerId = req.params.id;
+		console.log(employerId);
+
+		// creating the user
+		const { email, name, phone, role } = req.body;
+
+		const password = await hashPassword(req.body.password);
+		console.log(password);
+
+		await EmployerModel.findOneAndUpdate(
+			{ _id: employerId },
+			{
+				$push: {
+					users: {
+						email,
+						phone,
+						password,
+						role,
+						name,
+					},
+				},
+			}
+		);
+		const url = `${req.protocol}://${req.get('host')}/me`;
+		await new Email({ email, name }, url).sendWelcome();
+
+		return res
 			.json({
-				message: 'ERROR',
+				message: 'User created.',
 			})
 			.end();
+	} catch (error) {
+		return res.status(400).json({
+			message: error,
+		});
+	}
+};
+
+export const loginUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const { email, password, companyEmail } = req.body;
+		if (!email || !password || !companyEmail)
+			throw new Error('Insufficent data');
+
+		const employer = await EmployerModel.findOne(
+			{
+				email: companyEmail,
+			},
+			'users'
+		);
+		// Finding employer
+		console.log('Sl');
+		if (!employer) {
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
+		}
+		// Finding employee
+		const arr = employer.users;
+		let user;
+
+		for (let i = 0; i < arr.length; i++) {
+			const element = arr[i];
+
+			if (element.email === email) {
+				user = element;
+				break;
+			}
+		}
+
+		if (!user) {
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
+		}
+		// comparing password
+		const result = await comparePassword(password, user.password);
+
+		if (!result) {
+			return res
+				.status(400)
+				.json({
+					message: 'Wrong Creditanls',
+				})
+				.end();
+		}
+
+		const token = await jwt.sign(
+			{ payload: user },
+			`${process.env.SECRET_KEY}`,
+			{
+				expiresIn: '1hr',
+			}
+		);
+		res.cookie('login', token, { httpOnly: true });
+		return res.json({
+			message: 'User logged in',
+		});
+	} catch (error) {
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };

@@ -46,10 +46,36 @@ const employerSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Address should be present'],
 	},
-	interviewers: {
-		type: [mongoose.Schema.Types.ObjectId],
-		ref: 'Interviewer',
-	},
+	users: [
+		{
+			name: {
+				type: String,
+				required: true,
+			},
+			email: {
+				type: String,
+				required: true,
+				lowercase: true,
+				validate: {
+					validator: (v: string) => validator.validate(v),
+					message: 'Invalid email address',
+				},
+			},
+			password: {
+				type: String,
+				required: true,
+			},
+			phone: {
+				type: String,
+				required: true,
+			},
+			role: {
+				type: String,
+				required: true,
+				enum: ['HR Lead', 'HR', 'Employee'],
+			},
+		},
+	],
 });
 
 export const EmployerModel = mongoose.model('Employer', employerSchema);

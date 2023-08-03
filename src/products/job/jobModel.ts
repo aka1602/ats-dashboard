@@ -51,8 +51,45 @@ const jobSchema = new mongoose.Schema({
 	},
 	employerId: {
 		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Employer',
 		required: [true, 'employer Id should be created'],
 	},
+	Hired: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Applied: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Rejected: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Source: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Interview: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
+	Contacted: [
+		{
+			type: mongoose.Schema.Types.ObjectId,
+			ref: 'Employees',
+		},
+	],
 });
 
 export const jobModel = mongoose.model('job', jobSchema);
