@@ -132,7 +132,7 @@ export const createUser = async (
 	res: express.Response
 ) => {
 	try {
-		const employerId = req.params.id;
+		const employerId = req.params.userId;
 		console.log(employerId);
 
 		// creating the user
