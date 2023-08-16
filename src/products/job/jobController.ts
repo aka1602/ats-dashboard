@@ -11,7 +11,9 @@ export const jobCreate = async (
 		console.log(currentUserId);
 
 		if (!currentUserId) {
-			return res.sendStatus(403);
+			return res.status(401).json({
+				message: 'Wrong Creditials',
+			});
 		}
 		currentUserId = String(currentUserId);
 		const job = await jobModel.create({
@@ -22,7 +24,9 @@ export const jobCreate = async (
 		return res.json(job).end();
 	} catch (error) {
 		console.log(error);
-		return res.sendStatus(403);
+		return res.status(401).json({
+			message: error,
+		});
 	}
 };
 
@@ -33,7 +37,7 @@ export const getAllJobs = async (
 	try {
 		const jobs = await jobModel.find();
 
-		return res.sendStatus(200).json(jobs).end();
+		return res.status(200).json(jobs).end();
 	} catch (error) {
 		console.log(error);
 		return res.sendStatus(403);
