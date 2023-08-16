@@ -365,6 +365,5 @@ export default (router: express.Router) => {
 	 *         description: Internal server error
 	 */
 	router.get('/job', getAllJobs);
-
 	return router;
 };
