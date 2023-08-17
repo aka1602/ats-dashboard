@@ -338,29 +338,6 @@ export default (router: express.Router) => {
 	 *     responses:
 	 *       200:
 	 *         description: Successful response with the list of all jobs
-	 *         content:
-	 *           application/json:
-	 *             example:
-	 *               - jobTitle: Software Engineer
-	 *                 department: Engineering
-	 *                 location: San Francisco, CA
-	 *                 jobDescription: Develop and maintain software applications...
-	 *                 employmentType: Full-time
-	 *                 senorityLevel: Mid-Level
-	 *                 industryType: Technology
-	 *                 minSalary: 80000
-	 *                 maxSalary: 120000
-	 *                 workExperience: 3
-	 *               - jobTitle: Frontend Developer
-	 *                 department: Engineering
-	 *                 location: New York, NY
-	 *                 jobDescription: Design and develop user interfaces...
-	 *                 employmentType: Part-time
-	 *                 senorityLevel: Junior
-	 *                 industryType: Technology
-	 *                 minSalary: 60000
-	 *                 maxSalary: 90000
-	 *                 workExperience: 1
 	 *       500:
 	 *         description: Internal server error
 	 */
