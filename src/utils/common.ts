@@ -20,7 +20,6 @@ export const isLoggedIn = async (
 ) => {
 	try {
 		const token = req.cookies.login;
-		console.log(token);
 		if (!token) {
 			return res
 				.json({
@@ -33,7 +32,7 @@ export const isLoggedIn = async (
 			if (typeof payload === 'object') {
 				const id = payload.payload;
 				// const employer = await EmployeeModel.findById(id);
-				req.params.id = id;
+				req.params.userId = id;
 				next();
 			} else {
 				return res

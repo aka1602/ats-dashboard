@@ -90,6 +90,11 @@ const jobSchema = new mongoose.Schema({
 			ref: 'Employees',
 		},
 	],
+	jobStatus: {
+		type: String,
+		enum: ['Open', 'Closed'],
+		default: 'Open',
+	},
 });
 
 export const jobModel = mongoose.model('job', jobSchema);
