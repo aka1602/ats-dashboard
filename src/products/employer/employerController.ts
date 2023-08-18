@@ -72,8 +72,10 @@ export const signup = async (req: express.Request, res: express.Response) => {
 		req.body.password = await hashPassword(req.body.password);
 		const employer = await EmployerModel.create(req.body);
 
-		const url = `${req.protocol}://${req.get('host')}/me`;
-		await new Email(employer, url).sendWelcome();
+		const url = `${req.protocol}://${req.get('host')}/api/v1/employer/verify/${
+			employer.id
+		}`;
+		await new Email(employer, url).sendVerifyEmail();
 		return res.json({
 			message: 'User signed up',
 			data: employer,
@@ -235,6 +237,40 @@ export const loginUser = async (
 		});
 	} catch (error) {
 		return res.status(400).json({
+			message: error,
+		});
+	}
+};
+
+export const deleteEmployer = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		await EmployerModel.findByIdAndDelete(id);
+		return res.status(201).json({
+			message: 'Deleted',
+		});
+	} catch (error) {
+		return res.status(401).json({
+			message: error,
+		});
+	}
+};
+
+export const verifyEmployer = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		await EmployerModel.findByIdAndUpdate(id, { isVerified: true });
+		return res.status(201).json({
+			message: 'verified successfully',
+		});
+	} catch (error) {
+		return res.status(401).json({
 			message: error,
 		});
 	}

@@ -46,6 +46,10 @@ const employerSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Address should be present'],
 	},
+	isVerified: {
+		type: Boolean,
+		default: false,
+	},
 	users: [
 		{
 			name: {
