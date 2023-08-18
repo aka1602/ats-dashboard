@@ -119,6 +119,7 @@ export const login = async (req: express.Request, res: express.Response) => {
 				res.cookie('login', token, { httpOnly: true });
 				return res.json({
 					message: 'User logged in',
+					token,
 				});
 			}
 		}
