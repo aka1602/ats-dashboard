@@ -106,6 +106,9 @@ const employeeSchema = new mongoose.Schema({
 		type: Date,
 		required: true,
 	},
+	resume: {
+		type: String,
+	},
 });
 
 export const EmployeeModel = mongoose.model('Employees', employeeSchema);

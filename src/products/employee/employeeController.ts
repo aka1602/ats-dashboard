@@ -5,16 +5,18 @@ import {
 	getEmployees,
 	updateEmployeeById,
 	deleteEmployeeById,
+	EmployeeModel,
 } from './employeeModal';
 
 // Create a new employee
 export const create = async (req: express.Request, res: express.Response) => {
 	try {
-		const newEmployee = await createEmployee(req.body);
+		const newEmployee = await createEmployee({ ...req.body });
 		return res.status(200).json({ data: newEmployee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -28,8 +30,9 @@ export const getEmployee = async (
 		const employee = await getEmployeeByEmail(email);
 		return res.status(200).json({ data: employee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -43,8 +46,9 @@ export const getAllEmployees = async (
 
 		return res.status(200).json({ data: employees }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -59,8 +63,9 @@ export const updateEmployee = async (
 		const updatedEmployee = await updateEmployeeById(id, values);
 		return res.status(200).json({ data: updatedEmployee }).end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -77,7 +82,26 @@ export const deleteEmployee = async (
 			.json({ message: 'Employee is deleted', data: deletedEmployee })
 			.end();
 	} catch (error) {
-		console.error(error);
-		return res.status(400).json({ message: error }).end();
+		return res.status(400).json({
+			message: error,
+		});
+	}
+};
+
+// add resume to upload
+export const addResume = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		// console.log(req.file?.filename);
+
+		await EmployeeModel.findByIdAndUpdate(id, { resume: req.file?.filename });
+		return res.sendStatus(200);
+	} catch (error) {
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };

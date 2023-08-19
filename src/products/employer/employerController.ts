@@ -1,6 +1,8 @@
 import { EmployerModel } from './employerModel';
 import express from 'express';
-import { authentication, random } from '../../utils/common';
+import { comparePassword, hashPassword } from '../../utils/common';
+import jwt from 'jsonwebtoken';
+import { Email } from '../../utils/mailService';
 
 export const getAllEmployers = async (
 	req: express.Request,
@@ -16,13 +18,9 @@ export const getAllEmployers = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -32,10 +30,7 @@ export const getEmployerById = async (
 ) => {
 	try {
 		const id = req.params.id;
-		const employer = await EmployerModel.findById(id).populate('interviewers', [
-			'name',
-			'email',
-		]);
+		const employer = await EmployerModel.findById(id);
 
 		return res.status(200).json({
 			message: 'success',
@@ -44,13 +39,9 @@ export const getEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
@@ -70,106 +61,218 @@ export const updateEmployerById = async (
 			},
 		});
 	} catch (error) {
-		console.log(error);
-		return res
-			.status(400)
-			.json({
-				message: error,
-			})
-			.end();
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
-export const register = async (req: express.Request, res: express.Response) => {
+export const signup = async (req: express.Request, res: express.Response) => {
 	try {
-		const { email, password, name } = req.body;
+		req.body.password = await hashPassword(req.body.password);
+		const employer = await EmployerModel.create(req.body);
 
-		if (!password || !email) {
-			return res.sendStatus(403);
-		}
-
-		const existingUser = await EmployerModel.findOne({ email });
-		if (existingUser) {
-			return res.sendStatus(400);
-		}
-
-		const salt: string = random();
-		const {
-			role,
-			phone,
-			companyName,
-			industry,
-			designation,
-			pincode,
-			address,
-		} = req.body;
-
-		const employer = await EmployerModel.create({
-			name,
-			email,
-			authentication: {
-				password: authentication(salt, password),
-				salt,
-			},
-			role,
-			phone,
-			companyName,
-			industry,
-			designation,
-			pincode,
-			address,
+		const url = `${req.protocol}://${req.get('host')}/api/v1/employer/verify/${
+			employer.id
+		}`;
+		await new Email(employer, url).sendVerifyEmail();
+		return res.json({
+			message: 'User signed up',
+			data: employer,
 		});
-
-		return res.sendStatus(200).json(employer).end();
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(403);
+		return res.status(400).json({
+			message: error,
+		});
 	}
 };
 
 export const login = async (req: express.Request, res: express.Response) => {
 	try {
 		const { email, password } = req.body;
+		if (!email || !password) throw new Error('Insufficent data');
 
-		if (!email || !password) {
-			return res.sendStatus(400);
+		const employer = await EmployerModel.findOne({ email }).select('+password');
+		const hash = employer?.password;
+
+		if (!hash) {
+			return res.sendStatus(400).end();
+		} else {
+			const result = await comparePassword(password, hash);
+			if (!result) {
+				return res
+					.status(400)
+					.json({
+						message: 'Wrong Creditanls',
+					})
+					.end();
+			} else {
+				const uid = employer._id;
+				const token = await jwt.sign(
+					{ payload: uid },
+					`${process.env.SECRET_KEY}`,
+					{
+						expiresIn: '10m',
+					}
+				);
+
+				res.cookie('login', token, { httpOnly: true });
+				return res.json({
+					message: 'User logged in',
+					token,
+				});
+			}
 		}
-
-		const user = await EmployerModel.findOne({ email }).select(
-			'+authentication.salt +authentication.password'
-		);
-
-		if (!user || !user.authentication || !user.authentication.salt) {
-			return res.sendStatus(400);
-		}
-
-		const exprectedHash = authentication(user.authentication.salt, password);
-
-		if (user.authentication.password !== exprectedHash) {
-			return res.sendStatus(400);
-		}
-
-		const salt = random();
-		user.authentication.sessionToken = authentication(
-			salt,
-			user._id.toString()
-		);
-
-		await user.save();
-
-		res.cookie('AUTH-COOKIE', user.authentication.sessionToken, {
-			domain: 'localhost',
-			path: '/',
+	} catch (error) {
+		return res.status(400).json({
+			message: error,
 		});
+	}
+};
+
+export const createUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const employerId = req.params.userId;
+		console.log(employerId);
+
+		// creating the user
+		const { email, name, phone, role } = req.body;
+
+		const password = await hashPassword(req.body.password);
+		console.log(password);
+
+		await EmployerModel.findOneAndUpdate(
+			{ _id: employerId },
+			{
+				$push: {
+					users: {
+						email,
+						phone,
+						password,
+						role,
+						name,
+					},
+				},
+			}
+		);
+		const url = `${req.protocol}://${req.get('host')}/me`;
+		await new Email({ email, name }, url).sendWelcome();
 
 		return res
-			.status(200)
 			.json({
-				message: 'logged in',
+				message: 'User created.',
 			})
 			.end();
 	} catch (error) {
-		console.log(error);
-		return res.sendStatus(400);
+		return res.status(400).json({
+			message: error,
+		});
+	}
+};
+
+export const loginUser = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const { email, password, companyEmail } = req.body;
+		if (!email || !password || !companyEmail)
+			throw new Error('Insufficent data');
+
+		const employer = await EmployerModel.findOne(
+			{
+				email: companyEmail,
+			},
+			'users'
+		);
+		// Finding employer
+		console.log('Sl');
+		if (!employer) {
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
+		}
+		// Finding employee
+		const arr = employer.users;
+		let user;
+
+		for (let i = 0; i < arr.length; i++) {
+			const element = arr[i];
+
+			if (element.email === email) {
+				user = element;
+				break;
+			}
+		}
+
+		if (!user) {
+			return res.status(400).json({
+				message: 'Wrong Creditials',
+			});
+		}
+		// comparing password
+		const result = await comparePassword(password, user.password);
+
+		if (!result) {
+			return res
+				.status(400)
+				.json({
+					message: 'Wrong Creditanls',
+				})
+				.end();
+		}
+
+		const token = await jwt.sign(
+			{ payload: user },
+			`${process.env.SECRET_KEY}`,
+			{
+				expiresIn: '1hr',
+			}
+		);
+		res.cookie('login', token, { httpOnly: true });
+		return res.json({
+			message: 'User logged in',
+		});
+	} catch (error) {
+		return res.status(400).json({
+			message: error,
+		});
+	}
+};
+
+export const deleteEmployer = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		await EmployerModel.findByIdAndDelete(id);
+		return res.status(201).json({
+			message: 'Deleted',
+		});
+	} catch (error) {
+		return res.status(401).json({
+			message: error,
+		});
+	}
+};
+
+export const verifyEmployer = async (
+	req: express.Request,
+	res: express.Response
+) => {
+	try {
+		const id = req.params.id;
+		await EmployerModel.findByIdAndUpdate(id, { isVerified: true });
+		return res.status(201).json({
+			message: 'verified successfully',
+		});
+	} catch (error) {
+		return res.status(401).json({
+			message: error,
+		});
 	}
 };

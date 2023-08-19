@@ -25,11 +25,7 @@ const employerSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Contact Number should be mentioned'],
 	},
-	authentication: {
-		password: { type: String, required: true, select: false },
-		salt: { type: String, select: false },
-		sessionToken: { type: String, select: false },
-	},
+	password: { type: String, required: true, select: false },
 	companyName: {
 		type: String,
 		required: [true, 'Company Name should be present'],
@@ -50,10 +46,40 @@ const employerSchema = new mongoose.Schema({
 		type: String,
 		required: [true, 'Address should be present'],
 	},
-	interviewers: {
-		type: [mongoose.Schema.Types.ObjectId],
-		ref: 'Interviewer',
+	isVerified: {
+		type: Boolean,
+		default: false,
 	},
+	users: [
+		{
+			name: {
+				type: String,
+				required: true,
+			},
+			email: {
+				type: String,
+				required: true,
+				lowercase: true,
+				validate: {
+					validator: (v: string) => validator.validate(v),
+					message: 'Invalid email address',
+				},
+			},
+			password: {
+				type: String,
+				required: true,
+			},
+			phone: {
+				type: String,
+				required: true,
+			},
+			role: {
+				type: String,
+				required: true,
+				enum: ['HR Lead', 'HR', 'Employee'],
+			},
+		},
+	],
 });
 
 export const EmployerModel = mongoose.model('Employer', employerSchema);
