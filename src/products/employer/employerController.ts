@@ -117,8 +117,15 @@ export const login = async (req: express.Request, res: express.Response) => {
 				);
 
 				res.cookie('login', token, { httpOnly: true });
+
 				return res.json({
 					message: 'User logged in',
+					data: {
+						name: employer.name,
+						role: employer.role,
+						email: employer.email,
+						designation: employer.designation,
+					},
 					token,
 				});
 			}
